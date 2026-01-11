@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIBLINGS MEDIA</title>
+<style>
+/* ---------------- Global ---------------- */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+  text-align: center;
+  overflow-x: hidden;
+}
+h1 { background: #007bff; color: white; margin: 0; padding: 15px 0; font-size: 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+h2 { margin-top: 20px; color: #333; }
+.section { display: none; animation: fadeIn 0.5s ease-in-out; padding-bottom: 140px; }
+.active { display: block; }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+/* ---------------- Video Section ---------------- */
+.video-container {
+  max-width: 600px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  transition: transform 0.3s;
+}
+.video-container:hover { transform: scale(1.02); }
+.video-container iframe {
+  width: 100%;
+  height: 320px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.video-controls {
+  margin-top: 8px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+.video-controls button {
+  background:#007bff;
+  color:white;
+  border:none;
+  border-radius:8px;
+  padding:6px 12px;
+  font-size:14px;
+  cursor:pointer;
+}
+.video-controls button:hover{background:#0056b3;}
+
+/* ---------------- Photo Section ---------------- */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 10px;
+}
+.photo-grid img {
+  width: 100%;
+  aspect-ratio:1.3/1;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  cursor: zoom-in;
+  transition: transform 0.3s;
+}
+.photo-grid img:hover { transform: scale(1.05); }
+#lightbox {
+  display: none;
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.9);
+  text-align: center;
+  z-index: 1000;
+}
+#lightbox img { max-width: 90%; max-height: 90%; margin-top: 5%; border-radius: 12px; transition: opacity 0.3s; }
+#lightbox button { position:absolute; top:50%; font-size:30px; color:white; background:none; border:none; cursor:pointer; }
+
+/* ---------------- Music Section ---------------- */
+#musicPlayerContainer {
+  max-width: 400px;
+  margin: 20px auto 10px auto;
+  background: #007bff;
+  color: white;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+#musicPlayerContainer button {
+  background:white;
+  color:#007bff;
+  border:none;
+  border-radius:6px;
+  padding:5px 8px;
+  cursor:pointer;
+  margin:2px;
+}
+#musicPlayerContainer button:hover { background:#e0e0e0; }
+#musicProgress, #musicVolume { width: 95%; margin:5px 0; }
+
+#playlist {
+  max-width: 400px;
+  margin:0 auto 20px auto;
+  max-height: 200px;
+  overflow-y:auto;
+  text-align:left;
+}
+.playlist-item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:white;
+  margin:4px 0;
+  padding:5px 10px;
+  border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  cursor:pointer;
+  transition:0.3s;
+}
+.playlist-item:hover { background:#f0f0f0; }
+.playlist-item img { width:40px; height:40px; border-radius:8px; object-fit:cover; margin-right:10px; }
+.song-title { flex-grow:1; margin-left:5px; color:#333; font-weight:500; }
+.song-duration { font-size:12px; color:#555; margin-left:8px; }
+.download-icon { font-size:18px; color:#007bff; cursor:pointer; }
+.playing { border: 2px solid #007bff; }
+
+/* ---------------- Bottom Navigation ---------------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  border-top: 1px solid #ccc;
+  z-index: 999;
+}
+.bottom-nav button {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+  flex-grow: 1;
+  padding: 5px;
+  transition: 0.3s;
+}
+.bottom-nav button.active-tab { color: #007bff; font-weight: bold; }
+.bottom-nav span { display: block; font-size: 20px; }
+
+@media(max-width:600px){
+  .photo-grid { grid-template-columns: repeat(2,1fr);}
+  #musicPlayerContainer,#playlist { width:90%; margin:10px auto;}
+}
+</style>
+</head>
+<body>
+
+<h1>🎬 SIBLINGS MEDIA</h1>
+
+<!-- ================== VIDEOS ================== -->
+<div id="videos" class="section active">
+  <h2>🎥 OUR VIDEOS</h2>
+
+  <div class="video-container">
+    <h3>Mr and Mrs Bwalya</h3>
+    <iframe 
+      src="https://drive.google.com/file/d/1lzgQm7yQ4dRsEIHyLpVeOKr5fI7sG3yq/preview"
+      allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe>
+    <div class="video-controls">
+      <button onclick="downloadVideo('1lzgQm7yQ4dRsEIHyLpVeOKr5fI7sG3yq')">⬇️ Download</button>
+    </div>
+  </div>
+
+  <div class="video-container">
+    <h3>Mr And Mrs Lisomona</h3>
+    <iframe 
+      src="https://drive.google.com/file/d/17W33L9mUBVHccgy19_KFBfefSaFMpEHP/preview"
+      allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe>
+    <div class="video-controls">
+      <button onclick="downloadVideo('1WAwXhuBHD6EwD2uBFSUej3QmUZQAFBYb')">⬇️ Download</button>
+    </div>
+  </div>
+  <div class="video-container">
+    <h3>Enock And Jehovah's People</h3>
+    <iframe 
+      src="https://drive.google.com/file/d/1po12YANy_LGS0UuaboMXfHiN5c82XkLy/preview"
+      allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe>
+    <div class="video-controls">
+      <button onclick="downloadVideo('1WAwXhuBHD6EwD2uBFSUej3QmUZQAFBYb')">⬇️ Download</button>
+    </div>
+  </div>
+  <div class="video-container">
+    <h3>MARVIN MOVES</h3>
+    <iframe 
+      src="https://drive.google.com/file/d/1WAwXhuBHD6EwD2uBFSUej3QmUZQAFBYb/preview"
+      allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe>
+    <div class="video-controls">
+      <button onclick="downloadVideo('1WAwXhuBHD6EwD2uBFSUej3QmUZQAFBYb')">⬇️ Download</button>
+    </div>
+  </div>
+  <div class="video-container">
+    <h3>MARVIN MOVES</h3>
+    <iframe 
+      src="https://drive.google.com/file/d/1WAwXhuBHD6EwD2uBFSUej3QmUZQAFBYb/preview"
+      allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe>
+    <div class="video-controls">
+      <button onclick="downloadVideo('1WAwXhuBHD6EwD2uBFSUej3QmUZQAFBYb')">⬇️ Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================== PHOTOS ================== -->
+<div id="photos" class="section">
+  <h2>📸 My Photos</h2>
+  <div class="photo-grid">
+    <img src="fam.jpg" alt="Family" onclick="openLightboxSlide(0)">
+    <img src="wed.jpg" alt="Wedding" onclick="openLightboxSlide(1)">
+    <img src="big.jpg" alt="Big Event" onclick="openLightboxSlide(2)">
+    <img src="luka.jpg" alt="Luka" onclick="openLightboxSlide(3)">
+  </div>
+</div>
+
+<div id="lightbox" onclick="closeLightbox()">
+  <button style="left:10px;" onclick="prevSlide(event)">❮</button>
+  <img id="lightbox-img" src="">
+  <button style="right:10px;" onclick="nextSlide(event)">❯</button>
+</div>
+
+<!-- ================== MUSIC ================== -->
+<div id="music" class="section">
+  <h2>🎵 My Music</h2>
+  <div id="musicPlayerContainer">
+    <audio id="audioPlayer"></audio>
+    <div style="display:flex; justify-content:space-between;">
+      <button onclick="prevSong()">⏮</button>
+      <button onclick="playSong()">▶</button>
+      <button onclick="pauseSong()">⏸</button>
+      <button onclick="nextSong()">⏭</button>
+      <button onclick="shuffleSong()">🔀</button>
+    </div>
+    <input type="range" id="musicProgress" min="0" max="1" step="0.001" onchange="seekSong(this.value)">
+    Volume: <input type="range" id="musicVolume" min="0" max="1" step="0.01" onchange="setVolumeSong(this.value)">
+  </div>
+
+  <div id="playlist">
+    <div class="playlist-item" onclick="playSelectedSong(0)">
+      <img src="thumb1.jpg" alt="Chichi">
+      <div class="song-title">Chichi <span class="song-duration">3:45</span></div>
+      <div class="download-icon" onclick="downloadSong(event,0)">☁️</div>
+    </div>
+    <div class="playlist-item" onclick="playSelectedSong(1)">
+      <img src="thumb2.jpg" alt="Tasha">
+      <div class="song-title">Tasha <span class="song-duration">4:05</span></div>
+      <div class="download-icon" onclick="downloadSong(event,1)">☁️</div>
+    </div>
+    <div class="playlist-item" onclick="playSelectedSong(2)">
+      <img src="thumb3.jpg" alt="JW">
+      <div class="song-title">JW <span class="song-duration">2:50</span></div>
+      <div class="download-icon" onclick="downloadSong(event,2)">☁️</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================== BOTTOM NAVIGATION ================== -->
+<div class="bottom-nav">
+  <button id="btnVideos" class="active-tab" onclick="showSection('videos', this)"><span>🎥</span>Videos</button>
+  <button id="btnPhotos" onclick="showSection('photos', this)"><span>📸</span>Photos</button>
+  <button id="btnMusic" onclick="showSection('music', this)"><span>🎵</span>Music</button>
+</div>
+
+<script>
+function downloadVideo(fileId){
+  const link = document.createElement('a');
+  link.href = `https://drive.google.com/uc?export=download&id=${fileId}`;
+  link.download = "SIBLINGS_MEDIA_VIDEO.mp4";
+  link.click();
+}
+
+/* PHOTO GALLERY */
+let photos=['fam.jpg','wed.jpg','big.jpg','luka.jpg'];
+let currentSlide=0;
+function openLightboxSlide(index){ currentSlide=index; document.getElementById('lightbox-img').src=photos[currentSlide]; document.getElementById('lightbox').style.display='block'; }
+function closeLightbox(){ document.getElementById('lightbox').style.display='none'; }
+function nextSlide(event){ event.stopPropagation(); currentSlide=(currentSlide+1)%photos.length; document.getElementById('lightbox-img').src=photos[currentSlide]; }
+function prevSlide(event){ event.stopPropagation(); currentSlide=(currentSlide-1+photos.length)%photos.length; document.getElementById('lightbox-img').src=photos[currentSlide]; }
+
+/* MUSIC PLAYER */
+let songs=['chichi.mp3','tasha.mp3','jw.mp3'];
+let songIndex=0;
+const audio=document.getElementById('audioPlayer');
+audio.src=songs[songIndex];
+audio.addEventListener('timeupdate',()=>{ document.getElementById('musicProgress').value = audio.currentTime/audio.duration||0; });
+
+function playSong(){ audio.play(); highlightPlaying(); }
+function pauseSong(){ audio.pause(); }
+function nextSong(){ songIndex=(songIndex+1)%songs.length; audio.src=songs[songIndex]; audio.play(); highlightPlaying(); }
+function prevSong(){ songIndex=(songIndex-1+songs.length)%songs.length; audio.src=songs[songIndex]; audio.play(); highlightPlaying(); }
+function shuffleSong(){ songIndex=Math.floor(Math.random()*songs.length); audio.src=songs[songIndex]; audio.play(); highlightPlaying(); }
+function setVolumeSong(val){ audio.volume=val; }
+function seekSong(val){ audio.currentTime = val*audio.duration; }
+function playSelectedSong(index){ songIndex=index; audio.src=songs[songIndex]; audio.play(); highlightPlaying(); }
+function downloadSong(e,index){ e.stopPropagation(); const link=document.createElement('a'); link.href=songs[index]; link.download=songs[index]; link.click(); }
+function highlightPlaying(){
+  document.querySelectorAll('.playlist-item').forEach((el,i)=>el.classList.toggle('playing',i===songIndex));
+}
+
+/* NAVIGATION */
+function showSection(sectionId,button){
+  document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  document.querySelectorAll('.bottom-nav button').forEach(btn=>btn.classList.remove('active-tab'));
+  button.classList.add('active-tab');
+}
+</script>
+
+</body>
+</html>
