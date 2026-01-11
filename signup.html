@@ -1,0 +1,74 @@
+>><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Siblings Center | Sign Up</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+margin:0;font-family:Arial;background:linear-gradient(135deg,#5B0E9E,#7B3FE4);
+height:100vh;
+display:flex;justify-content:center;align-items:center;
+}
+.box{
+background:white;width:90%;max-width:360px;padding:30px;border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+h2{text-align:center;color:#5B0E9E}
+input{width:100%;padding:14px;margin-top:15px;border-radius:12px;border:1px solid #ddd;font-size:16px;}
+button{width:100%;padding:14px;margin-top:20px;background:#5B0E9E;color:white;border:none;border-radius:12px;font-size:16px;}
+p{text-align:center;margin-top:20px}
+a{color:#5B0E9E;text-decoration:none;font-weight:bold}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h2>Create Account</h2>
+<input id="name" placeholder="Full Name">
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="signup()">Sign Up</button>
+<p>Already have account? <a href="login.html">Login</a></p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBdlDAj6SBzRChqDRfvecD_XRFgeSjKtiQ",
+  authDomain: "siblings-140f7.firebaseapp.com",
+  projectId: "siblings-140f7",
+  storageBucket: "siblings-140f7.firebasestorage.app",
+  messagingSenderId: "17665689198",
+  appId: "1:17665689198:web:575e848f837d7b35b4c87f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+async function signup(){
+  const name=document.getElementById("name").value;
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
+
+  if(!name || !email || !password){ alert("Fill all fields"); return; }
+
+  try{
+    const userCredential = await createUserWithEmailAndPassword(auth,email,password);
+    const uid = userCredential.user.uid;
+
+    // Save user name to Firestore
+    await setDoc(doc(db,"users",uid),{name,email});
+
+    alert("Account created!");
+    window.location="login.html";
+  }catch(e){ alert(e.message); }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Siblings Center | Photos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #F5F3FA;
+}
+
+/* HEADER */
+.header {
+    background: #5B0E9E;
+    color: white;
+    padding: 35px 20px;
+    border-bottom-left-radius: 28px;
+    border-bottom-right-radius: 28px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.header .back-btn {
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* PHOTO GRID */
+.photo-grid {
+    padding: 25px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.photo-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photo-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.photo-card img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    height: 160px;
+}
+
+/* MAGNIFY ICON */
+.magnify-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 32px;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* FULLSCREEN MODAL */
+#photoModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.95);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* PHOTO */
+#photoModal img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* SHOW ACTIVE */
+#photoModal.active {
+    display: flex;
+    opacity: 1;
+}
+
+#photoModal.active img {
+    opacity: 1;
+}
+
+/* CLOSE BUTTON */
+.close-btn,
+.arrow,
+.menu-btn,
+.menu-dropdown {
+    display: none; /* hidden by default */
+}
+
+#photoModal.active .close-btn,
+#photoModal.active .arrow,
+#photoModal.active .menu-btn {
+    display: block;
+}
+
+/* CLOSE BUTTON */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #5B0E9E;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* THREE DOT MENU */
+.menu-btn {
+    position: absolute;
+    top: 15px;
+    right: 80px;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 80px;
+    background: white;
+    color: black;
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    z-index: 1010;
+}
+
+.menu-dropdown div {
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.menu-dropdown div:hover {
+    background: #f0f0f0;
+}
+
+/* ARROWS */
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+}
+
+.arrow:hover {
+    opacity: 1;
+}
+
+.arrow-left {
+    left: 20px;
+}
+
+.arrow-right {
+    right: 20px;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <i class="fa fa-arrow-left back-btn" onclick="goBack()"></i>
+    <h2>Photos</h2>
+</div>
+
+<!-- PHOTO GRID -->
+<div class="photo-grid" id="photoGrid"></div>
+
+<!-- FULLSCREEN MODAL -->
+<div id="photoModal">
+    <img id="modalPhoto" src="">
+    <button class="close-btn" onclick="closePhoto()">Close</button>
+
+    <!-- Three dot menu -->
+    <i class="fa fa-ellipsis-v menu-btn" onclick="toggleMenu()"></i>
+    <div class="menu-dropdown" id="menuDropdown">
+        <div onclick="downloadPhoto()">Download</div>
+        <div onclick="startSlideShow()">Slide Show</div>
+    </div>
+
+    <!-- Arrows -->
+    <i class="fa fa-chevron-left arrow arrow-left" onclick="prevPhoto()"></i>
+    <i class="fa fa-chevron-right arrow arrow-right" onclick="nextPhoto()"></i>
+</div>
+
+<script>
+// ------------- PHOTO ARRAY -------------
+const photos = [
+    "luka.jpg",
+    "wed.jpg",
+    "fam.jpg",
+    "luka.jpg"
+];
+
+let currentIndex = 0;
+let slideShowInterval = null;
+
+// ------------- GENERATE GRID -------------
+const grid = document.getElementById('photoGrid');
+photos.forEach((photo, index) => {
+    const card = document.createElement('div');
+    card.className = "photo-card";
+    card.onclick = () => openPhoto(index);
+
+    const img = document.createElement('img');
+    img.src = photo;
+    img.alt = `Photo ${index+1}`;
+
+    const icon = document.createElement('i');
+    icon.className = "fa fa-search-plus magnify-icon";
+
+    card.appendChild(img);
+    card.appendChild(icon);
+    grid.appendChild(card);
+});
+
+// ------------- FUNCTIONS -------------
+
+function goBack(){
+    window.location.href = "dashboard.html";
+}
+
+function openPhoto(index){
+    currentIndex = index;
+    const modal = document.getElementById('photoModal');
+    modal.classList.add('active');
+    document.getElementById('modalPhoto').src = photos[currentIndex];
+    document.getElementById('menuDropdown').style.display = 'none';
+}
+
+function closePhoto(){
+    const modal = document.getElementById('photoModal');
+    modal.classList.remove('active');
+    document.getElementById('menuDropdown').style.display = 'none';
+    clearInterval(slideShowInterval);
+    document.getElementById('modalPhoto').src = '';
+}
+
+function nextPhoto(){
+    currentIndex = (currentIndex + 1) % photos.length;
+    document.getElementById('modalPhoto').src = photos[currentIndex];
+}
+
+function prevPhoto(){
+    currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+    document.getElementById('modalPhoto').src = photos[currentIndex];
+}
+
+// Three-dot menu
+function toggleMenu(){
+    let menu = document.getElementById('menuDropdown');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+function downloadPhoto(){
+    let link = document.createElement('a');
+    link.href = photos[currentIndex];
+    link.download = photos[currentIndex].split('/').pop();
+    link.click();
+    toggleMenu();
+}
+
+function startSlideShow(){
+    slideShowInterval = setInterval(nextPhoto, 2000);
+    toggleMenu();
+}
+</script>
+
+</body>
+</html>

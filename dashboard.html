@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Siblings Center | Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:url("fam.jpg") center/cover no-repeat fixed;
+}
+
+/* Overlay for readability */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:-1;
+}
+
+/* HEADER */
+.header{
+  background:rgba(91,14,158,.9);
+  padding:55px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:white;
+  border-bottom-left-radius:28px;
+  border-bottom-right-radius:28px;
+}
+
+/* SIDE MENU */
+.side-menu{
+  position:fixed;
+  top:0;
+  left:-280px;
+  width:280px;
+  height:100%;
+  background:#3B0A66;
+  transition:.3s;
+  z-index:20;
+  overflow-y:auto;
+}
+
+.side-menu a{
+  display:block;
+  padding:15px 25px;
+  color:white;
+  text-decoration:none;
+}
+
+/* PROFILE */
+.profile-box{
+  padding:30px 20px;
+  text-align:center;
+  border-bottom:1px solid rgba(255,255,255,.2);
+}
+
+.profile-box img{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  border:3px solid white;
+  object-fit:cover;
+}
+
+.profile-box h3{
+  color:white;
+  margin-top:10px;
+  font-size:18px;
+}
+
+/* OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.3);
+  display:none;
+  z-index:10;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+  padding:25px;
+}
+
+.card{
+  background:rgba(255,255,255,.45);
+  backdrop-filter:blur(6px);
+  padding:28px;
+  border-radius:16px;
+  text-align:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+  cursor:pointer;
+}
+
+.card i{
+  font-size:32px;
+  color:#5B0E9E;
+}
+
+.card p{
+  margin-top:8px;
+  color:#3B0A66;
+  font-weight:bold;
+}
+
+/* CHAT BUTTON */
+.chat-wrapper{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:30;
+}
+
+.chat-btn{
+  background:#7c3aed;
+  border:none;
+  color:white;
+  padding:12px 20px;
+  border-radius:40px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.chat-menu{
+  position:absolute;
+  bottom:60px;
+  right:0;
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+  display:none;
+  box-shadow:0 6px 16px rgba(0,0,0,.3);
+}
+
+.chat-menu a{
+  display:block;
+  padding:12px 18px;
+  text-decoration:none;
+  color:#3B0A66;
+  font-weight:600;
+}
+.chat-menu a:hover{background:#f2f2f2;}
+</style>
+</head>
+
+<body>
+
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<div class="side-menu" id="menu">
+  <div class="profile-box">
+    <img id="profilePic" src="profile/default.jpg">
+    <h3 id="profileName">Loading...</h3>
+  </div>
+
+  <a href="info.html"><i class="fa fa-user"></i> Personal Info</a>
+  <a href="event.html"><i class="fa fa-calendar"></i> Events</a>
+  <a href="achievement.html"><i class="fa fa-trophy"></i> Achievements</a>
+</div>
+
+<div class="header">
+  <i class="fa fa-bars" onclick="openMenu()"></i>
+  <h2>SIBLINGS CENTER</h2>
+  <i class="fa fa-right-from-bracket" onclick="logout()"></i>
+</div>
+
+<div class="grid">
+  <div class="card" onclick="location.href='video.html'"><i class="fa fa-video"></i><p>Videos</p></div>
+  <div class="card" onclick="location.href='photo.html'"><i class="fa fa-image"></i><p>Photos</p></div>
+  <div class="card" onclick="location.href='music.html'"><i class="fa fa-music"></i><p>Music</p></div>
+  <div class="card" onclick="location.href='movie.html'"><i class="fa fa-film"></i><p>Movies</p></div>
+</div>
+
+<div class="chat-wrapper">
+  <button class="chat-btn" onclick="toggleChat()">💬 Chat</button>
+  <div class="chat-menu" id="chatMenu">
+    <a href="https://chat.whatsapp.com/EDZL1AYPOih199mlJmqmQl" target="_blank">WhatsApp</a>
+    <a href="chat.html">Family Chat</a>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR KEY",
+  authDomain: "YOUR DOMAIN",
+  databaseURL: "YOUR DB",
+  projectId: "YOUR ID",
+  appId: "YOUR APP ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+onAuthStateChanged(auth, user=>{
+  if(!user){
+    window.location="login.html";
+    return;
+  }
+
+  get(ref(db,"users/"+user.uid)).then(snap=>{
+    if(snap.exists()){
+      const u = snap.val();
+      document.getElementById("profileName").innerText = u.name;
+      document.getElementById("profilePic").src = "profile/"+u.photo;
+    }
+  });
+});
+
+window.logout=()=>{
+  signOut(auth).then(()=>location.href="login.html");
+}
+</script>
+
+<script>
+function openMenu(){
+  menu.style.left="0";
+  overlay.style.display="block";
+}
+function closeMenu(){
+  menu.style.left="-280px";
+  overlay.style.display="none";
+}
+
+function toggleChat(){
+  chatMenu.style.display = chatMenu.style.display=="block"?"none":"block";
+}
+
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".chat-wrapper")){
+    chatMenu.style.display="none";
+  }
+});
+</script>
+
+</body>
+</html>

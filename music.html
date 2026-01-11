@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Siblings Center | Music</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBdlDAj6SBzRChqDRfvecD_XRFgeSjKtiQ",
+    authDomain: "siblings-140f7.firebaseapp.com",
+    projectId: "siblings-140f7",
+    storageBucket: "siblings-140f7.appspot.com",
+    messagingSenderId: "17665689198",
+    appId: "1:17665689198:web:575e848f837d7b35b4c87f",
+    measurementId: "G-XWB4B54TLQ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+</script>
+
+<style>
+body, html{margin:0;padding:0;font-family:Arial;width:100%;height:100%;}
+.full-bg{width:100%;min-height:100vh;background-size:cover;background-position:center;position:relative;color:#5B0E9E;padding-bottom:50px;}
+.header{display:flex;align-items:center;justify-content:space-between;background:#5B0E9E;color:white;padding:15px 20px;border-bottom-left-radius:20px;border-bottom-right-radius:20px;}
+.header i{color:white;cursor:pointer;font-size:22px;}
+.header h3{margin:0;flex-grow:1;text-align:center;font-size:20px;}
+
+/* REQUEST */
+.request-btn{background:#5B0E9E;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
+.request-btn i{margin-right:5px;}
+#requestPop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center;}
+#requestPop .popup-content{background:white;padding:20px;border-radius:12px;width:90%;max-width:400px;position:relative;}
+#requestPop .popup-content span{position:absolute;top:8px;right:12px;cursor:pointer;font-size:20px;}
+
+/* CATEGORY GRID */
+.category-grid{padding:20px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:10px;}
+.category-card{display:flex;align-items:center;gap:12px;cursor:pointer;color:#5B0E9E;font-weight:bold;text-shadow:0 2px 5px rgba(255,255,255,0.8);}
+.music-icon{font-size:26px;color:#5B0E9E;}
+
+/* SEARCH */
+#searchBar{width:95%;padding:10px 12px;margin:10px auto;border-radius:12px;border:none;font-size:16px;}
+
+/* MUSIC LIST */
+#musicList{background-size:cover;border-radius:20px;padding:15px;display:flex;flex-direction:column;gap:10px;margin:10px;}
+.music-bar{display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;color:#5B0E9E;}
+.music-bar div b,.music-bar div p{text-shadow:0 2px 5px rgba(255,255,255,0.8);}
+
+/* PLAYER */
+#player{display:flex;flex-direction:column;width:90%;max-width:900px;margin:20px auto;padding:20px;text-align:center;border-radius:20px;position:relative;background-size:cover;background-position:center;}
+#player::before{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background: rgba(255,255,255,0.1);border-radius:20px;z-index:0;}
+#player > *{position:relative;z-index:1;}
+#visualizer{height:120px;display:flex;align-items:flex-end;gap:5px;margin-bottom:15px;}
+.bar{flex:1;background:#5B0E9E;border-radius:4px;height:10%;}
+
+/* CONTROLS */
+.controls{display:flex;justify-content:center;gap:30px;font-size:26px;margin-top:20px;color:#5B0E9E;}
+.extra-controls{display:flex;justify-content:center;gap:25px;font-size:18px;margin-top:15px;color:#5B0E9E;}
+</style>
+</head>
+<body>
+
+<!-- CATEGORY VIEW -->
+<div id="catBg" class="full-bg" style="background-image:url('wed.jpg')">
+  <div class="header"><h3>Music</h3></div>
+  <div class="category-grid" id="categoryGrid"></div>
+  <div style="padding:15px;text-align:right;">
+    <button class="request-btn" onclick="openRequest()"><i class="fa fa-plus"></i> Request a Song</button>
+  </div>
+</div>
+
+<!-- MUSIC LIST VIEW -->
+<div id="listBg" class="full-bg" style="background-image:url('luka.jpg'); display:none;">
+  <div class="header"><i class="fa fa-arrow-left" onclick="goBack()"></i><h3 id="catTitle"></h3></div>
+  <input type="text" id="searchBar" placeholder="Search songs...">
+  <div id="musicList"></div>
+</div>
+
+<!-- PLAYER VIEW -->
+<div id="playerBg" class="full-bg" style="background-image:url('wed.jpg'); display:none;">
+  <div class="header"><i class="fa fa-arrow-left" onclick="goBack()"></i><h3 id="playerTitle"></h3></div>
+  <div id="player">
+    <div id="visualizer"></div>
+    <h3 id="title"></h3>
+    <p id="artist"></p>
+    <div class="controls">
+      <i class="fa fa-backward" onclick="prev()"></i>
+      <i class="fa fa-play" id="playBtn" onclick="toggle()"></i>
+      <i class="fa fa-forward" onclick="next()"></i>
+    </div>
+    <div class="extra-controls">
+      <i class="fa fa-shuffle" id="shuffleBtn" onclick="toggleShuffle()"></i>
+      <i class="fa fa-repeat" id="repeatBtn" onclick="toggleRepeat()"></i>
+      <i class="fa fa-list" onclick="showPlaylist()"></i>
+      <i class="fa fa-sliders" onclick="toggleEQ()"></i>
+    </div>
+  </div>
+  <audio id="audio"></audio>
+</div>
+
+<!-- REQUEST POPUP -->
+<div id="requestPop">
+  <div class="popup-content">
+    <span onclick="closeRequest()">&times;</span>
+    <h3>Request a Song</h3>
+    <input type="text" id="reqTitle" placeholder="Song Title">
+    <input type="text" id="reqArtist" placeholder="Artist Name">
+    <button onclick="submitRequest()">Submit</button>
+  </div>
+</div>
+
+<script type="module">
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+// SONG DATA
+const songs=[
+  {title:"We Won't Stop",artist:"Jw",src:"jw.mp3",cat:"Jw Songs"},
+  {title:"Together",artist:"Jane",src:"music/song2.mp3",cat:"Family"},
+  {title:"Kids Fun",artist:"Kids Band",src:"music/song3.mp3",cat:"Kids"},
+  {title:"Peace",artist:"Relax",src:"music/song4.mp3",cat:"Relax"}
+];
+const categories=["Jw Songs","Zed Mix","Yo Maps Yo","Odies","Chile One","Modecaii","African Mix"];
+let currentSongs=[], index=0, currentCat=null, isShuffle=false, repeatMode="all";
+
+// FIREBASE
+const db = window.db;
+
+// POPUP REQUEST
+function openRequest(){ document.getElementById('requestPop').style.display='flex'; }
+function closeRequest(){ document.getElementById('requestPop').style.display='none'; }
+async function submitRequest(){
+  const title=document.getElementById('reqTitle').value.trim();
+  const artist=document.getElementById('reqArtist').value.trim();
+  if(!title || !artist){ alert("Enter both title and artist"); return; }
+  try{
+    await addDoc(collection(db,"songRequests"), {title, artist, timestamp:new Date()});
+    alert("Request submitted!");
+    document.getElementById('reqTitle').value='';
+    document.getElementById('reqArtist').value='';
+    closeRequest();
+  }catch(e){ console.error(e); alert("Failed to submit request."); }
+}
+
+// CATEGORY GRID
+const catGrid=document.getElementById("categoryGrid");
+categories.forEach(c=>{
+  const d=document.createElement("div");
+  d.className="category-card";
+  d.innerHTML=`<i class="fa fa-folder music-icon"></i><b>${c}</b>`;
+  d.onclick=()=>showMusicList(c);
+  catGrid.appendChild(d);
+});
+
+// ELEMENTS
+const listBg=document.getElementById("listBg");
+const musicList=document.getElementById("musicList");
+const playerBg=document.getElementById("playerBg");
+const player=document.getElementById("player");
+const audio=document.getElementById("audio");
+const titleEl=document.getElementById("title");
+const artistEl=document.getElementById("artist");
+const playBtn=document.getElementById("playBtn");
+
+// VIEW FUNCTIONS
+function showCategories(){ document.getElementById('catBg').style.display='block'; listBg.style.display='none'; playerBg.style.display='none'; }
+function showMusicList(cat){
+  currentCat=cat;
+  document.getElementById('catBg').style.display='none';
+  listBg.style.display='block';
+  playerBg.style.display='none';
+  document.getElementById("catTitle").innerText=cat;
+  currentSongs=songs.filter(s=>s.cat===cat);
+  renderMusicList(currentSongs);
+}
+function showPlayer(i){
+  index=i;
+  listBg.style.display='none';
+  playerBg.style.display='block';
+  document.getElementById("playerTitle").innerText=currentSongs[index].title;
+  load();
+}
+function goBack(){
+  if(playerBg.style.display==='block') showMusicList(currentCat);
+  else if(listBg.style.display==='block') showCategories();
+}
+
+// RENDER MUSIC LIST
+function renderMusicList(listSongs){
+  musicList.innerHTML='';
+  listSongs.forEach((s,i)=>{
+    const d=document.createElement("div");
+    d.className="music-bar";
+    d.innerHTML=`<i class="fa fa-music music-icon"></i><div><b>${s.title}</b><br>${s.artist}</div>`;
+    d.onclick=()=>showPlayer(i);
+    musicList.appendChild(d);
+  });
+}
+
+// SEARCH
+document.getElementById('searchBar').addEventListener('input', filterSongs);
+function filterSongs(){
+  const term=document.getElementById('searchBar').value.toLowerCase();
+  renderMusicList(currentSongs.filter(s=>s.title.toLowerCase().includes(term) || s.artist.toLowerCase().includes(term)));
+}
+
+// AUDIO PLAYER
+function load(){ audio.src=currentSongs[index].src; titleEl.innerText=currentSongs[index].title; artistEl.innerText=currentSongs[index].artist; audio.play(); playBtn.className="fa fa-pause"; }
+function toggle(){ if(audio.paused){audio.play();playBtn.className="fa fa-pause";} else{audio.pause();playBtn.className="fa fa-play";} }
+function next(){ index=isShuffle?Math.floor(Math.random()*currentSongs.length):(index+1)%currentSongs.length; load(); }
+function prev(){ index=(index-1+currentSongs.length)%currentSongs.length; load(); }
+function toggleShuffle(){ isShuffle=!isShuffle; document.getElementById("shuffleBtn").style.color=isShuffle?"#00c853":"#5B0E9E"; }
+function toggleRepeat(){ repeatMode=repeatMode==="all"?"one":repeatMode==="one"?"off":"all"; alert("Repeat: "+repeatMode); }
+audio.onended=()=>{ repeatMode==="one"?load():repeatMode==="all"?next():null; }
+function showPlaylist(){alert("Playlist coming soon")}
+function toggleEQ(){alert("Equalizer coming soon")}
+
+// VISUALIZER
+const ctx=new (window.AudioContext||window.webkitAudioContext)();
+const srcCtx=ctx.createMediaElementSource(audio);
+const analyser=ctx.createAnalyser();
+srcCtx.connect(analyser); analyser.connect(ctx.destination);
+analyser.fftSize=64;
+const data=new Uint8Array(analyser.frequencyBinCount);
+const vis=document.getElementById("visualizer");
+for(let i=0;i<20;i++){ let b=document.createElement("div"); b.className="bar"; vis.appendChild(b);}
+function animate(){ requestAnimationFrame(animate); analyser.getByteFrequencyData(data); document.querySelectorAll(".bar").forEach((b,i)=>{ b.style.height=(data[i]/255*100)+"%"; }); }
+animate();
+
+// EXPOSE FUNCTIONS GLOBALLY
+window.load = load; window.toggle = toggle; window.next = next; window.prev = prev;
+window.toggleShuffle = toggleShuffle; window.toggleRepeat = toggleRepeat;
+window.showPlaylist = showPlaylist; window.toggleEQ = toggleEQ;
+window.filterSongs = filterSongs; window.showMusicList = showMusicList;
+window.showPlayer = showPlayer; window.goBack = goBack;
+window.openRequest = openRequest; window.closeRequest = closeRequest; window.submitRequest = submitRequest;
+
+// INIT VIEW
+showCategories();
+</script>
+</body>
+</html>

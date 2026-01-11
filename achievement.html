@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Family Achievements | Siblings Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:Arial;background:#f4f4f8}
+
+/* Header */
+header{
+ background:linear-gradient(135deg,#6a0dad,#8e2de2);
+ color:white;
+ padding:16px;
+ display:flex;
+ align-items:center;
+}
+header h2{margin:0 auto;}
+.back-btn{font-size:22px;cursor:pointer}
+
+/* Grid */
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+ gap:12px;
+ padding:12px;
+}
+
+/* Achievement Card */
+.achievement-card{
+ position:relative;
+ border-radius:12px;
+ overflow:hidden;
+ cursor:pointer;
+ box-shadow:0 4px 12px rgba(0,0,0,.15);
+ transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+.achievement-card:hover{
+ transform:translateY(-4px);
+ box-shadow:0 6px 18px rgba(0,0,0,.2);
+}
+.achievement-card img{
+ width:100%;
+ height:200px;
+ object-fit:cover;
+ display:block;
+}
+.achievement-overlay{
+ position:absolute;
+ bottom:0;
+ left:0;
+ right:0;
+ padding:12px;
+ background:linear-gradient(transparent, rgba(0,0,0,0.6));
+ color:white;
+}
+.achievement-overlay h3{
+ margin:0;
+ font-size:18px;
+}
+.achievement-overlay p{
+ margin:2px 0 0 0;
+ font-size:14px;
+}
+
+/* Pending badge */
+.pending-badge{
+ position:absolute;
+ top:8px;
+ left:8px;
+ background:#ff9800;
+ color:white;
+ padding:4px 8px;
+ border-radius:6px;
+ font-size:12px;
+ font-weight:bold;
+ display:none;
+}
+
+/* Loader spinner */
+.loader{
+ border:4px solid #f3f3f3;
+ border-top:4px solid #6a0dad;
+ border-radius:50%;
+ width:30px;
+ height:30px;
+ animation:spin 1s linear infinite;
+ position:absolute;
+ top:40%;
+ left:40%;
+ z-index:10;
+}
+@keyframes spin{
+ 0%{transform:rotate(0deg);}
+ 100%{transform:rotate(360deg);}
+}
+
+/* Floating + */
+.add-btn{
+ position:fixed;
+ bottom:20px;
+ right:20px;
+ width:60px;
+ height:60px;
+ border-radius:50%;
+ background:#6a0dad;
+ color:white;
+ font-size:36px;
+ border:none;
+ box-shadow:0 4px 12px rgba(0,0,0,.3);
+ cursor:pointer;
+}
+
+/* Three-dot menu */
+.menu{
+ position:absolute;
+ top:8px;
+ right:8px;
+}
+.dots{font-size:20px;cursor:pointer;padding:5px}
+.menu-content{
+ display:none; /* hidden by default */
+ position:absolute;
+ right:0;
+ top:25px;
+ background:white;
+ border-radius:8px;
+ box-shadow:0 2px 10px rgba(0,0,0,.2);
+ z-index:10;
+}
+.menu-content div{
+ padding:10px 15px;
+ cursor:pointer;
+}
+.menu-content div:hover{background:#eee}
+
+/* Detail Modal / Slideshow */
+.detail-modal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.8);
+ display:none;
+ justify-content:center;
+ align-items:center;
+ z-index:50;
+}
+.detail-box{
+ background:white;
+ border-radius:12px;
+ max-width:700px;
+ width:90%;
+ max-height:80%;
+ overflow:hidden;
+ padding:20px;
+ position:relative;
+ text-align:center;
+}
+.detail-box img{
+ max-width:100%;
+ max-height:400px;
+ object-fit:cover;
+ border-radius:12px;
+}
+.close-detail{
+ position:absolute;
+ top:10px;
+ right:15px;
+ font-size:22px;
+ cursor:pointer;
+ font-weight:bold;
+ color:#6a0dad;
+}
+.slideshow-nav{
+ position:absolute;
+ top:50%;
+ width:100%;
+ display:flex;
+ justify-content:space-between;
+ transform:translateY(-50%);
+ pointer-events:none;
+}
+.slideshow-nav span{
+ font-size:36px;
+ color:white;
+ background:rgba(0,0,0,0.4);
+ border-radius:50%;
+ width:50px;
+ height:50px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ cursor:pointer;
+ pointer-events:auto;
+}
+.detail-text{
+ margin-top:12px;
+ text-align:left;
+}
+.detail-text h3{margin:0;}
+.detail-text p{margin:4px 0;}
+
+/* Popup styles */
+.popup{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,0.5);
+ justify-content:center;
+ align-items:center;
+ z-index:100;
+}
+.popup-box{
+ background:white;
+ border-radius:12px;
+ width:320px;
+ max-width:90%;
+ padding:20px;
+ display:flex;
+ flex-direction:column;
+ gap:12px;
+ box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.popup-box input, .popup-box textarea{
+ width:100%;
+ padding:10px;
+ border-radius:8px;
+ border:1px solid #ccc;
+ font-size:14px;
+ font-family:inherit;
+ resize:none;
+}
+.popup-box input:focus, .popup-box textarea:focus{
+ border-color:#6a0dad;
+ outline:none;
+ box-shadow:0 0 4px rgba(106,13,173,0.5);
+}
+.popup-box button{
+ background:#6a0dad;
+ color:white;
+ padding:10px;
+ border:none;
+ border-radius:8px;
+ font-size:16px;
+ cursor:pointer;
+ transition:background 0.2s;
+}
+.popup-box button:hover{background:#8e2de2;}
+</style>
+</head>
+
+<body>
+
+<header>
+<span class="back-btn" onclick="goBack()">←</span>
+<h2>Family Achievements</h2>
+</header>
+
+<div class="grid" id="achievementGrid"></div>
+
+<button class="add-btn" onclick="openPopup()">+</button>
+
+<!-- Add/Edit Popup -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <h3 id="popupTitle">Add Achievement</h3>
+    <input id="title" placeholder="Achievement title">
+    <input id="date" type="date">
+    <textarea id="desc" placeholder="Description / Quote"></textarea>
+    <button id="saveBtn">Save</button>
+  </div>
+</div>
+
+<!-- Detail Slideshow Modal -->
+<div class="detail-modal" id="detailModal">
+  <div class="detail-box">
+    <span class="close-detail" onclick="closeDetail()">×</span>
+    <img id="detailImage" src="">
+    <div class="slideshow-nav">
+      <span id="prevSlide">❮</span>
+      <span id="nextSlide">❯</span>
+    </div>
+    <div class="detail-text">
+      <h3 id="detailTitle"></h3>
+      <p id="detailDate"></p>
+      <p id="detailCreator"></p>
+      <p id="detailDesc"></p>
+      <p id="detailQuote" style="font-style:italic;color:#6a0dad;"></p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase config
+const firebaseConfig = {
+ apiKey: "AIzaSyBdlDAj6SBzRChqDRfvecD_XRFgeSjKtiQ",
+ authDomain: "siblings-140f7.firebaseapp.com",
+ projectId: "siblings-140f7",
+ storageBucket: "siblings-140f7.firebasestorage.app",
+ messagingSenderId: "17665689198",
+ appId: "1:17665689198:web:575e848f837d7b35b4c87f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const userName = localStorage.getItem("userName") || "Unknown";
+
+const popup = document.getElementById("popup");
+const saveBtn = document.getElementById("saveBtn");
+
+const githubBaseURL = "https://raw.githubusercontent.com/username/repo/main/images/achievements/"; 
+
+/* Load achievements */
+onSnapshot(collection(db,"achievements"), snap=>{
+ const grid = document.getElementById("achievementGrid");
+ grid.innerHTML="";
+ snap.forEach(docu=>{
+   const a = docu.data();
+   const id = docu.id;
+
+   const cardImg = a.images && a.images.length>0 ? githubBaseURL + a.images[0] : "placeholder.jpg";
+   const cardQuote = a.quotes && a.quotes.length>0 ? a.quotes[Math.floor(Math.random()*a.quotes.length)] : "";
+
+   const card = document.createElement("div");
+   card.className="achievement-card";
+
+   card.innerHTML=`
+     <div class="loader"></div>
+     <img src="${cardImg}" alt="achievement">
+     <div class="achievement-overlay">
+       <h3>${a.title}</h3>
+       <p>${cardQuote}</p>
+     </div>
+     <div class="pending-badge">Images Pending</div>
+     <div class="menu">
+       <span class="dots">⋮</span>
+       <div class="menu-content">
+         <div onclick="editAchievement('${id}')">Edit</div>
+         <div onclick="deleteAchievement('${id}')">Delete</div>
+       </div>
+     </div>
+   `;
+
+   // Pending badge
+   const badge = card.querySelector(".pending-badge");
+   if (!a.images || a.images.length === 0) badge.style.display="block";
+
+   // Loader handling
+   const imgEl = card.querySelector("img");
+   const loader = card.querySelector(".loader");
+   imgEl.onload = ()=> loader.style.display="none";
+   imgEl.onerror = ()=> {loader.style.display="none"; imgEl.src="placeholder.jpg";};
+
+   // Click opens detail modal (ignore menu clicks)
+   card.addEventListener("click", e=>{
+     if(!e.target.classList.contains('dots')) showDetail(a);
+   });
+
+   grid.appendChild(card);
+ });
+});
+
+/* Toggle menu on dots click */
+document.addEventListener("click", function(e){
+  const isDot = e.target.classList.contains("dots");
+  const allMenus = document.querySelectorAll(".menu-content");
+  
+  // Close all menus first
+  allMenus.forEach(menu => menu.style.display="none");
+
+  // If clicked on a dot, toggle its menu
+  if(isDot){
+    const menu = e.target.nextElementSibling;
+    if(menu) menu.style.display="block";
+  }
+});
+
+/* Popup */
+window.openPopup = ()=>{
+ editId=null;
+ document.getElementById("popupTitle").innerText="Add Achievement";
+ document.getElementById("title").value="";
+ document.getElementById("date").value="";
+ document.getElementById("desc").value="";
+ popup.style.display="flex";
+}
+
+/* Edit Achievement */
+let editId = null;
+window.editAchievement = (id)=>{
+ editId=id;
+ const docRef = doc(db,"achievements",id);
+ docRef.get?.().then(snapshot=>{
+   const data = snapshot.data();
+   document.getElementById("popupTitle").innerText="Edit Achievement";
+   document.getElementById("title").value = data.title;
+   document.getElementById("date").value = data.date;
+   document.getElementById("desc").value = data.description;
+   popup.style.display="flex";
+ });
+}
+
+/* Save add/edit */
+saveBtn.addEventListener("click", async ()=>{
+ const title = document.getElementById("title").value.trim();
+ const date = document.getElementById("date").value.trim();
+ const desc = document.getElementById("desc").value.trim();
+ if(!title || !date) return alert("Title and Date required");
+ popup.style.display="none";
+
+ try{
+   if(editId){
+     await updateDoc(doc(db,"achievements",editId),{title,date,description:desc});
+   }else{
+     await addDoc(collection(db,"achievements"),{
+       title,date,description:desc,createdBy:userName,timestamp:Date.now(),images:[],quotes:[]
+     });
+   }
+ }catch(err){console.error(err);}
+});
+
+/* Delete achievement */
+window.deleteAchievement = async id=>{
+ if(confirm("Delete this achievement?")) await deleteDoc(doc(db,"achievements",id));
+}
+
+/* Detail Modal / Slideshow */
+const detailModal = document.getElementById("detailModal");
+const detailImage = document.getElementById("detailImage");
+const detailTitle = document.getElementById("detailTitle");
+const detailDate = document.getElementById("detailDate");
+const detailCreator = document.getElementById("detailCreator");
+const detailDesc = document.getElementById("detailDesc");
+const detailQuote = document.getElementById("detailQuote");
+
+let currentIndex = 0;
+let currentImages = [];
+let currentQuotes = [];
+
+function showDetail(a){
+  currentImages = a.images.map(f=>githubBaseURL+f);
+  currentQuotes = a.quotes || [];
+  currentIndex=0;
+  updateSlide();
+
+  detailTitle.innerText = a.title;
+  detailDate.innerText = a.date;
+  detailCreator.innerText = "Added by: "+(a.createdBy||"Unknown");
+  detailDesc.innerText = a.description || "";
+  detailModal.style.display="flex";
+}
+
+function updateSlide(){
+  detailImage.src = currentImages[currentIndex] || "placeholder.jpg";
+  detailQuote.innerText = currentQuotes[currentIndex] || "";
+}
+
+document.getElementById("nextSlide").onclick = ()=>{
+  currentIndex = (currentIndex+1)%currentImages.length;
+  updateSlide();
+}
+document.getElementById("prevSlide").onclick = ()=>{
+  currentIndex = (currentIndex-1+currentImages.length)%currentImages.length;
+  updateSlide();
+}
+
+window.closeDetail = ()=> detailModal.style.display="none";
+window.goBack = ()=> location.href="dashboard.html";
+</script>
+</body>
+</html>
