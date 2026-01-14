@@ -70,7 +70,7 @@ body, html{margin:0;padding:0;font-family:Arial;width:100%;height:100%;}
 </div>
 
 <!-- MUSIC LIST VIEW -->
-<div id="listBg" class="full-bg" style="background-image:url('music1.jpg'); display:none;">
+<div id="listBg" class="full-bg" style="background-image:url('music1.webp'); display:none;">
   <div class="header"><i class="fa fa-arrow-left" onclick="goBack()"></i><h3 id="catTitle"></h3></div>
   <input type="text" id="searchBar" placeholder="Search songs...">
   <div id="musicList"></div>
@@ -115,9 +115,9 @@ import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/fi
 // SONG DATA
 const songs=[
   {title:"We Won't Stop",artist:"Jw",src:"jw.mp3",cat:"Jw Songs", artwork:"cbu.jpg"},
-  {title:"Track 1",artist:"Modecaii",src:"mod1.mp3",cat:"Modecaii Zm", artwork:"cover2.jpg"},
-  {title:"Track 2",artist:"Modecaii",src:"mod2.mp3",cat:"Modecaii Zm", artwork:"cover3.jpg"},
-  {title:"Track 3",artist:"Modecaii",src:"mod3.mp3",cat:"Relax", artwork:"cover4.jpg"}
+  {title:"Track 1",artist:"Modecaii",src:"mod1.mp3",cat:"Modecaii Zm", artwork:"Big.jpg"},
+  {title:"Track 2",artist:"Modecaii",src:"mod2.mp3",cat:"Modecaii Zm", artwork:"marvin.jpg"},
+  {title:"Track 3",artist:"Modecaii",src:"mod3.mp3",cat:"Modecaii Zm", artwork:"Sugo.jpg"}
 ];
 const categories=["Jw Songs","Zed Mix","Yo Maps Yo","Odies","Chile One","Modecaii Zm","African Mix"];
 let currentSongs=[], index=0, currentCat=null, isShuffle=false, repeatMode="all";
