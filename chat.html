@@ -1,207 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Family Chat | Siblings Center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{margin:0;font-family:Arial;background:#f4f4f8;display:flex;flex-direction:column;height:100vh}
+body{margin:0;font-family:Arial, sans-serif;display:flex;flex-direction:column;height:100vh;background:#0F0F0F;color:white;}
+header{background:#3B0A66;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;}
+header h2{margin:0;font-weight:500;}
+.back-btn{font-size:22px;cursor:pointer;color:white;}
 
-/* Header */
-header{
- background:linear-gradient(135deg,#6a0dad,#8e2de2);
- color:white;
- padding:16px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- position:relative;
-}
-header h2{margin:0;}
-.back-btn{font-size:22px;cursor:pointer}
-.header-menu{font-size:20px;cursor:pointer;padding:0 10px;user-select:none;}
-.header-menu-content{
- display:none;
- position:absolute;
- top:50px;
- right:10px;
- background:white;
- border-radius:8px;
- box-shadow:0 2px 10px rgba(0,0,0,.2);
- min-width:120px;
- z-index:10;
-}
-.header-menu-content div{
- padding:8px 12px;
- cursor:pointer;
- font-size:13px;
- color:#333;
- background:white;
-}
-.header-menu-content div:hover{background:#eee}
-
-/* Chat area */
-#chatArea{
- flex:1;
- overflow-y:auto;
- padding:12px;
- display:flex;
- flex-direction:column;
- gap:4px;
- transition:background 0.3s;
-}
-
-/* Message bubbles */
+#chatArea{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px;background:#0F0F0F;}
 .message-wrapper{display:flex;align-items:flex-end;gap:8px;position:relative;}
 .my-message-wrapper{flex-direction:row-reverse;}
-.my-message, .other-message{
- padding:10px;
- border-radius:12px;
- max-width:70%;
- word-wrap:break-word;
- box-shadow:0 2px 8px rgba(0,0,0,.15);
- position:relative;
- display:flex;
- flex-direction:column;
-}
-.my-message{background:#7c3aed;color:white;}       
-.other-message{background:#e0e0e0;color:#333;}     
-.message-wrapper strong{font-size:13px;display:block;margin-bottom:4px;}
-.message-wrapper .msg-time{
- font-size:10px;
- color:#999;
- margin-top:4px;
- text-align:right;
- display:block;
-}
-.my-message-wrapper .msg-time{text-align:right;}
-.other-message-wrapper .msg-time{text-align:left;}
+.profile-pic{width:34px;height:34px;border-radius:50%;object-fit:cover;}
 
-/* Profile pics */
-.profile-pic{
- width:32px;
- height:32px;
- border-radius:50%;
- object-fit:cover;
+.my-message,.other-message{
+  padding:12px;border-radius:14px;max-width:75%;word-wrap:break-word;
+  display:flex;flex-direction:column;box-shadow:0 4px 10px rgba(0,0,0,.4);position:relative;
+  transition:background 0.2s;
 }
+.my-message{background:#7C3AED;color:white;border-bottom-right-radius:4px;}
+.my-message:hover{background:#9146FF;}
+.other-message{background:#2E2E2E;color:#ddd;border-bottom-left-radius:4px;}
+.other-message:hover{background:#4B2E8D;}
 
-/* Three-dot menu */
-.dots{
- font-size:16px;
- cursor:pointer;
- margin-left:4px;
- user-select:none;
+.msg-time{font-size:10px;color:#bbb;margin-top:4px;text-align:right;}
+.reply-block{
+  font-size:12px;color:#ccc;padding:6px 10px;margin-bottom:6px;
+  border-left:3px solid #9146FF;border-radius:6px;display:flex;align-items:flex-start;
+  gap:6px;background:rgba(255,255,255,0.05);overflow-wrap:break-word;
+}
+.reply-block img{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+
+.menu-btn{
+  font-size:16px;cursor:pointer;position:absolute;top:6px;right:6px;color:#aaa;user-select:none;
 }
 .menu-content{
- display:none;
- position:absolute;
- right:0;
- top:100%;
- background:white;
- border-radius:8px;
- box-shadow:0 2px 10px rgba(0,0,0,.2);
- z-index:10;
- min-width:100px;
+  display:none;position:absolute;right:0;top:20px;background:#1A1A1A;border-radius:8px;
+  box-shadow:0 2px 10px rgba(0,0,0,.5);min-width:100px;z-index:10;
 }
 .menu-content div{
- padding:6px 10px;
- cursor:pointer;
- font-size:13px;
- color:#333;
- background:white;
+  padding:6px 10px;color:white;cursor:pointer;
 }
-.menu-content div:hover{background:#eee}
+.menu-content div:hover{background:#3B0A66;}
 
-/* Reply block */
-.reply-block{
- font-size:12px;
- background:rgba(0,0,0,0.05);
- color:#333;
- padding:4px 8px;
- border-radius:8px;
- margin-bottom:6px;
- max-width:90%;
- overflow-wrap:break-word;
-}
-
-/* Reactions below message */
-.reactions{
- display:flex;
- gap:4px;
- margin:2px 0 6px 40px;
- font-size:14px;
-}
-.my-message-wrapper .reactions{ margin-left:auto; margin-right:0; }
-.reactions span{
- padding:2px 6px;
- border-radius:12px;
- background:rgba(0,0,0,.05);
- cursor:pointer;
-}
-
-/* Emoji picker */
-#emojiPicker{
- display:none;
- position:absolute;
- background:white;
- padding:8px;
- border-radius:12px;
- box-shadow:0 2px 8px rgba(0,0,0,.2);
- display:flex;
- flex-wrap:wrap;
- gap:6px;
- z-index:50;
-}
-.emoji{font-size:20px;cursor:pointer;user-select:none;}
-
-/* Input area */
-#inputArea{
- display:flex;
- padding:10px;
- background:#fff;
- box-shadow:0 -2px 6px rgba(0,0,0,.1);
-}
-#chatInput{
- flex:1;
- padding:10px;
- border-radius:25px;
- border:1px solid #ccc;
- font-size:14px;
- outline:none;
-}
-#sendBtn{
- width:50px;
- height:50px;
- border:none;
- background:#7c3aed;
- color:white;
- border-radius:50%;
- font-size:20px;
- margin-left:10px;
- cursor:pointer;
- box-shadow:0 2px 6px rgba(0,0,0,.2);
- transition:background 0.2s;
-}
-#sendBtn:hover{background:#9d4edd;}
+#inputArea{display:flex;padding:10px;background:#0F0F0F;border-top:1px solid #222;}
+#chatInput{flex:1;padding:12px 16px;border-radius:25px;border:none;background:#2E2E2E;color:white;outline:none;}
+#sendBtn{width:46px;height:46px;border:none;background:#7C3AED;color:white;border-radius:50%;font-size:20px;margin-left:10px;cursor:pointer;transition:0.2s;}
+#sendBtn:hover{background:#9146FF;}
 </style>
 </head>
 <body>
 
 <header>
- <span class="back-btn" onclick="goBack()">←</span>
- <h2>Family Chat</h2>
- <span class="header-menu">⋮</span>
- <div class="header-menu-content" id="headerMenu">
-   <div onclick="setWallpaper('wallpaper1.jpg')">Wallpaper 1</div>
-   <div onclick="setWallpaper('wallpaper2.jpg')">Wallpaper 2</div>
-   <div onclick="setWallpaper('wallpaper3.jpg')">Wallpaper 3</div>
-   <div onclick="setWallpaper('wallpaper4.jpg')">Wallpaper 4</div>
-   <div onclick="setWallpaper('wallpaper5.jpg')">Wallpaper 5</div>
- </div>
+ <span class="back-btn" onclick="window.history.back()">←</span>
+ <h2>SIBLINGS CHAT ROOM</h2>
 </header>
 
 <div id="chatArea"></div>
-<div id="emojiPicker"></div>
 
 <div id="inputArea">
  <input id="chatInput" placeholder="Type a message...">
@@ -210,187 +67,140 @@ header h2{margin:0;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, deleteDoc, doc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, orderBy, serverTimestamp, onSnapshot, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Firebase config
 const firebaseConfig = {
- apiKey: "AIzaSyBdlDAj6SBzRChqDRfvecD_XRFgeSjKtiQ",
- authDomain: "siblings-140f7.firebaseapp.com",
- projectId: "siblings-140f7",
- storageBucket: "siblings-140f7.firebasestorage.app",
- messagingSenderId: "17665689198",
- appId: "1:17665689198:web:575e848f837d7b35b4c87f"
+  apiKey: "AIzaSyBdlDAj6SBzRChqDRfvecD_XRFgeSjKtiQ",
+  authDomain: "siblings-140f7.firebaseapp.com",
+  projectId: "siblings-140f7",
+  storageBucket: "siblings-140f7.appspot.com",
+  messagingSenderId: "17665689198",
+  appId: "1:17665689198:web:575e848f837d7b35c87f"
 };
+
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-// User info
-const userId = localStorage.getItem("userId") || "user123";
-const userName = localStorage.getItem("userName") || "Unknown";
-const userPhoto = localStorage.getItem("userPhoto") || "default.jpg";
+let currentUser = null;
+let replyToMessage = null;
 
 const chatArea = document.getElementById("chatArea");
 const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
-const emojiPicker = document.getElementById("emojiPicker");
 
-// Emojis
-const emojis = ['❤️','😂','👍','😮','😢','👏','🔥','😍'];
-emojis.forEach(e=>{
-  const span = document.createElement("span");
-  span.className="emoji";
-  span.textContent = e;
-  span.onclick = ()=>{if(selectedMessageId) reactMessage(selectedMessageId,e)};
-  emojiPicker.appendChild(span);
+// AUTH
+onAuthStateChanged(auth, user=>{
+    if(!user) window.location="login.html";
+    currentUser = user;
+    loadMessages();
 });
 
-let selectedMessageId = null;
-
-// Load user's wallpaper from Firestore
-async function loadWallpaper(){
-  const userRef = doc(db,"users",userId);
-  const docSnap = await getDoc(userRef);
-  if(docSnap.exists() && docSnap.data().wallpaper){
-    chatArea.style.background = `url('${docSnap.data().wallpaper}') center/cover no-repeat`;
-  }
-}
-
-// Set wallpaper and save to Firestore
-async function setWallpaper(file){
-  chatArea.style.background = `url('${file}') center/cover no-repeat`;
-  const userRef = doc(db,"users",userId);
-  await updateDoc(userRef,{ wallpaper: file });
-}
-
-loadWallpaper();
-
-// Send message
-async function sendMessage(replyTo=null){
- const text = chatInput.value.trim();
- if(!text) return;
- await addDoc(collection(db,"messages"),{
-   text,
-   sender:userName,
-   photoURL:userPhoto,
-   timestamp:serverTimestamp(),
-   time:new Date().toLocaleTimeString(),
-   reactions:{},
-   replyTo
- });
- chatInput.value="";
- selectedMessageId = null;
- emojiPicker.style.display="none";
-}
-
-// Events
-sendBtn.addEventListener("click", ()=>sendMessage());
+// SEND MESSAGE
+sendBtn.addEventListener("click", sendMessage);
 chatInput.addEventListener("keypress", e=>{if(e.key==="Enter") sendMessage();});
 
-// Listen for messages
-const q = query(collection(db,"messages"), orderBy("timestamp"));
-onSnapshot(q, snap=>{
- chatArea.innerHTML="";
- snap.forEach(docu=>{
-   const msg = docu.data();
-   const id = docu.id;
+async function sendMessage(){
+  const text = chatInput.value.trim();
+  if(!text || !currentUser) return;
 
-   const wrapper = document.createElement("div");
-   wrapper.className = "message-wrapper "+(msg.sender===userName?"my-message-wrapper":"");
-   wrapper.setAttribute("data-id",id);
+  const msgData = {
+    text,
+    uid: currentUser.uid,
+    timestamp: serverTimestamp()
+  };
 
-   const replyHTML = msg.replyTo ? 
-     `<div class="reply-block">@${msg.replyTo.sender}: ${msg.replyTo.text}</div>` : "";
+  if(replyToMessage){
+    msgData.replyTo = {...replyToMessage};
+    replyToMessage = null;
+  }
 
-   // reactions displayed under bubble
-   let reactionsHTML="";
-   if(msg.reactions){
-     for(const [emoji,users] of Object.entries(msg.reactions)){
-       reactionsHTML+=`<span>${emoji} ${users.length}</span>`;
-     }
-   }
+  await addDoc(collection(db,"messages"), msgData);
+  chatInput.value="";
+}
 
-   wrapper.innerHTML = `
-     <img src="${msg.photoURL}" class="profile-pic">
-     <div class="${msg.sender===userName?'my-message':'other-message'}">
-       <strong>${msg.sender}</strong>
-       ${replyHTML}
-       <p>${msg.text}</p>
-       <span class="msg-time">${msg.time || ''}</span>
-       <span class="dots">⋮</span>
-       <div class="menu-content">
-         ${msg.sender===userName?`<div onclick="deleteMessage('${id}')">Delete</div>`:''}
-         <div onclick="selectMessageForReact('${id}',event)">React</div>
-         <div onclick="replyMessage('${msg.sender}','${msg.text}')">Reply</div>
-       </div>
-     </div>
-     <div class="reactions"></div>
-   `;
-   chatArea.appendChild(wrapper);
+// LOAD MESSAGES
+function loadMessages(){
+  const q = query(collection(db,"messages"), orderBy("timestamp"));
+  onSnapshot(q, async snap=>{
+    chatArea.innerHTML = "";
 
-   // Render reactions dynamically
-   const reactionDiv = wrapper.querySelector(".reactions");
-   if(msg.reactions){
-     for(const [emoji,users] of Object.entries(msg.reactions)){
-       const span = document.createElement('span');
-       span.textContent = `${emoji} ${users.length}`;
-       reactionDiv.appendChild(span);
-     }
-   }
- });
- chatArea.scrollTop = chatArea.scrollHeight;
+    // Collect all user IDs to fetch profiles
+    const userIds = new Set();
+    snap.docs.forEach(docu=>{
+      const msg = docu.data();
+      userIds.add(msg.uid);
+      if(msg.replyTo) userIds.add(msg.replyTo.uid);
+    });
 
- // three-dot toggle
- document.querySelectorAll(".dots").forEach(dot=>{
-   dot.onclick = e=>{
-     e.stopPropagation();
-     const menu = dot.nextElementSibling;
-     document.querySelectorAll(".menu-content").forEach(m=>{if(m!==menu)m.style.display="none"});
-     menu.style.display = menu.style.display==="block"?"none":"block";
-   }
- });
+    const usersMap = {};
+    await Promise.all(Array.from(userIds).map(async uid=>{
+      const userSnap = await getDoc(doc(db,"users",uid));
+      usersMap[uid] = userSnap.exists() ? userSnap.data() : {name:"Unknown", photo:"default.png"};
+    }));
+
+    snap.docs.forEach(docu=>{
+      const msg = docu.data();
+      const sender = usersMap[msg.uid];
+
+      let replyHTML = "";
+      if(msg.replyTo){
+        const replyUser = usersMap[msg.replyTo.uid];
+        replyHTML = `
+          <div class="reply-block">
+            <img src="${replyUser.photo}" alt="">
+            <div><strong>@${replyUser.name}</strong>: ${msg.replyTo.text}</div>
+          </div>
+        `;
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "message-wrapper "+(msg.uid===currentUser.uid?"my-message-wrapper":"");
+      wrapper.innerHTML = `
+        <img src="${sender.photo}" class="profile-pic">
+        <div class="${msg.uid===currentUser.uid?'my-message':'other-message'}">
+          <strong>${sender.name}</strong>
+          ${replyHTML}
+          <p>${msg.text}</p>
+          <span class="msg-time">${msg.timestamp ? new Date(msg.timestamp.seconds*1000).toLocaleTimeString() : ""}</span>
+          <span class="menu-btn">⋮</span>
+          <div class="menu-content">
+            ${msg.uid===currentUser.uid ? `<div onclick="deleteMessage('${docu.id}')">Delete</div>` : ""}
+            <div onclick="replyMessage('${msg.uid}','${sender.name}','${msg.text}','${sender.photo}')">Reply</div>
+          </div>
+        </div>
+      `;
+      chatArea.appendChild(wrapper);
+
+      wrapper.querySelector(".menu-btn").onclick = e=>{
+        e.stopPropagation();
+        const menu = wrapper.querySelector(".menu-content");
+        document.querySelectorAll(".menu-content").forEach(m=>{if(m!==menu)m.style.display="none"});
+        menu.style.display = menu.style.display==="block"?"none":"block";
+      };
+    });
+
+    chatArea.scrollTop = chatArea.scrollHeight;
+  });
+}
+
+// DELETE
+window.deleteMessage = async (id)=>{
+  if(confirm("Delete this message?")) await deleteDoc(doc(db,"messages",id));
+}
+
+// REPLY
+window.replyMessage = (uid,name,text,photo)=>{
+  replyToMessage = {uid,name,text,photo};
+  chatInput.value = `@${name} `;
+  chatInput.focus();
+}
+
+// CLOSE ALL MENUS WHEN CLICKING OUTSIDE
+document.addEventListener("click", ()=>{
+  document.querySelectorAll(".menu-content").forEach(m=>m.style.display="none");
 });
-
-// Delete message
-window.deleteMessage = async id=>{ if(confirm("Delete this message?")) await deleteDoc(doc(db,"messages",id)); }
-
-// Reply
-window.replyMessage = (sender,text)=>{
- chatInput.focus();
- chatInput.value=`@${sender} `;
-}
-
-// Select message for react
-window.selectMessageForReact = (id,event)=>{
- selectedMessageId=id;
- emojiPicker.style.display="flex";
- const rect = event.target.getBoundingClientRect();
- emojiPicker.style.top = `${rect.bottom + window.scrollY}px`;
- emojiPicker.style.left = `${rect.left + window.scrollX}px`;
-}
-
-// React
-async function reactMessage(id,emoji){
- const messageRef = doc(db,"messages",id);
- await updateDoc(messageRef,{
-   [`reactions.${emoji}`]: arrayUnion(userName)
- });
- selectedMessageId=null;
- emojiPicker.style.display="none";
-}
-
-// Close menus
-document.addEventListener("click",()=>document.querySelectorAll(".menu-content").forEach(m=>m.style.display="none"));
-document.addEventListener("click",()=>emojiPicker.style.display="none");
-
-// Header menu
-const headerMenu = document.getElementById("headerMenu");
-document.querySelector(".header-menu").onclick = e=>{
- e.stopPropagation();
- headerMenu.style.display = headerMenu.style.display==="block"?"none":"block";
-}
-
-// Back
-function goBack(){ location.href="dashboard.html"; }
 </script>
 
 </body>
