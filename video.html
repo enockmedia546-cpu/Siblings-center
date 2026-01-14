@@ -2,73 +2,246 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Safe Video Modal</title>
+<title>Siblings Center | Videos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body { margin:0; font-family:Arial,sans-serif; background:#F5F3FA; }
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0F0F0F;
+    color:white;
+}
 
-/* VIDEO GRID */
-.video-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:15px; padding:20px; }
-.video-card { position:relative; cursor:pointer; border-radius:10px; overflow:hidden; }
-.video-card img { width:100%; display:block; height:140px; object-fit:cover; }
-.play-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:36px; color:white; pointer-events:none; }
+/* HEADER */
+.header{
+    padding:15px 20px;
+    border-bottom:1px solid #222;
+}
+.search-box{
+    width:100%;
+    padding:12px;
+    background:#1A1A1A;
+    border:none;
+    border-radius:8px;
+    color:white;
+}
 
-/* MODAL & OVERLAY */
-#overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); display:none; z-index:999; }
-#videoModal { position:fixed; top:10%; left:50%; transform:translateX(-50%); width:95%; max-width:1000px; height:50vh; background:black; display:none; z-index:1000; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); }
-#videoModal iframe { width:100%; height:100%; border:none; border-radius:12px; }
+/* CATEGORY */
+.category-select{
+    display:flex;
+    gap:20px;
+    padding:15px 20px;
+    border-bottom:1px solid #222;
+}
+.category-select button{
+    background:none;
+    border:none;
+    color:#aaa;
+    font-size:14px;
+    cursor:pointer;
+}
+.category-select button.active{
+    color:white;
+    border-bottom:3px solid #E50914;
+}
 
-/* CLOSE BUTTON as symbol */
-.close-btn { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:white; border:none; font-size:20px; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
-.close-btn:hover { background:rgba(255,0,0,0.8); }
+/* SECTION TITLE */
+.section-title{
+    padding:15px 20px;
+    font-size:16px;
+    color:#ddd;
+}
+
+/* GRID */
+.video-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    padding:0 20px 20px;
+}
+.video-card{
+    background:#1A1A1A;
+    border-radius:10px;
+    overflow:hidden;
+    cursor:pointer;
+    position:relative;
+}
+.video-card img{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+}
+.video-title{
+    padding:10px;
+    font-size:14px;
+}
+.play-icon{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:30px;
+    background:rgba(0,0,0,.7);
+    padding:16px;
+    border-radius:50%;
+}
+
+/* MODAL */
+#overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    z-index:9;
+}
+#videoModal{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:90%;
+    max-width:900px;
+    height:55vh;
+    background:black;
+    display:none;
+    z-index:10;
+    border-radius:12px;
+}
+#videoModal iframe{
+    width:100%;
+    height:100%;
+    border:none;
+}
+.close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:#E50914;
+    color:white;
+    border:none;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+}
 </style>
 </head>
+
 <body>
 
-<div class="video-grid">
-    <div class="video-card" data-video="https://drive.google.com/file/d/1a2B3cD4EfGhIjKlMn/preview">
-        <img src="thumbnail1.jpg" alt="Video 1">
-        <i class="fa fa-play-circle play-icon"></i>
-    </div>
-    <div class="video-card" data-video="https://drive.google.com/file/d/1HqSn9FK28XdqLUy6ibKi40VxGp4lTZ1X/preview">
-        <img src="fam.jpg" alt="Video 2">
-        <i class="fa fa-play-circle play-icon"></i>
-    </div>
+<div class="header">
+    <input type="text" id="searchInput" class="search-box" placeholder="Search videos...">
 </div>
 
-<div id="overlay"></div>
+<div class="category-select">
+    <button class="active" data-cat="All">All</button>
+    <button data-cat="Nigerian">Nigerian</button>
+    <button data-cat="Action">Action</button>
+    <button data-cat="Fwebene">Fwebene</button>
+    <button data-cat="Music">Music</button>
+</div>
 
+<div class="section-title">Recently Watched</div>
+<div class="video-grid" id="recentArea"></div>
+
+<div class="section-title">All Videos</div>
+<div class="video-grid" id="videosArea"></div>
+
+<div id="overlay"></div>
 <div id="videoModal">
-    <iframe id="modalVideo" allow="autoplay; fullscreen"></iframe>
+    <iframe id="modalVideo"></iframe>
     <button class="close-btn" onclick="closeVideo()">×</button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const cards = document.querySelectorAll('.video-card');
-    const modal = document.getElementById('videoModal');
-    const overlay = document.getElementById('overlay');
-    const iframe = document.getElementById('modalVideo');
+const videos = [
+ {title:"ALWAYS HERE_SONIA_UCHE...", cat:"Nigerian", img:"sonia.jpg", video:"https://drive.google.com/file/d/1HqSn9FK28XdqLUy6ibKi40VxGp4lTZ1X/preview"},
+ {title:"ODOGWU_-_ACHALUGO-LOVE IN EVERY WORD PART 1", cat:"Nigerian", img:"odogwu1.jpg", video:"https://drive.google.com/file/d/1ghJj1129yNQfrVP3Ar_3PRwmum48NYo8/preview"},
+ {title:"ODOGWU_-_ACHALUGO-LOVE IN EVERY WORD PART 2", cat:"Nigerian", img:"odogwu2.jpg", video:"https://drive.google.com/file/d/18BANqNpy8pBnTCRXPhAdIhyC9LuxV-pA/preview"},
+    {title:"TOO GOOD TO BE TRUE",cat:"Nigerian",img:"true.jpg",video:"https://drive.google.com/file/d/1sk6n2ffSHZbS7b6CwPx7F9R0pDsZtLgD/preview"},
+    {title:"CARRY AM GO_-_MOSSES BLISS",cat:"Music",im:"carry.jpg",video:"https://drive.google.com/file/d/1vSD2sjBpyJ9lKA2ZBWrN0MH4Ju_Y4zUk/preview"},
+    {title:"I was like Big Bro here is the Camera...",cat:"Fwebene",img:"Big.jpg",video:"https://drive.google.com/file/d/1I0qIBJeFnx9Ehc171iVHQ4aaFcLABF7X/preview"},
+    {title:"Another Couple Soon to Make us Dance...",cat:"Fwebene",img:"Tk.jpg",video:"https://drive.google.com/file/d/17W33L9mUBVHccgy19_KFBfefSaFMpEHP/preview"},
+    {title:"OUR FIRST WEDDING-She made us All Proud",cat:"Fwebene",img:"wed1.jpg",video:"https://drive.google.com/file/d/1lzgQm7yQ4dRsEIHyLpVeOKr5fI7sG3yq/preview"},
+    {title:"We won't Stop Working For Jehovah-Enock",cat:"Fwebene",img:"Guard.jpg",video:"https://drive.google.com/file/d/1po12YANy_LGS0UuaboMXfHiN5c82XkLy/preview"},
+    {title:"KING OF MALLS_-_NKANA MALL",cat:"Fwebene",img:"Sugo.jpg",video:"https://drive.google.com/file/d/1QpfjuFWR85EisO73-R5Y40Sb3pkUVMcN/preview"},
+    {title:"KING OF MALLS_-_MUKUBA MALL",cat:"Fwebene",img:"Sugo.jpg",video:"https://drive.google.com/file/d/1Uq5Y-6i_LUqSPL6goYBh_uWDL4fJ4n7S/preview"},
+    {title:"CBU FAMILY",cat:"Fwebene",img:"cbu.jpg",video:"https://drive.google.com/file/d/1mZceD0FQOSWsvAtH3ThGd5YNFmBLpk6H/preview"}
+];
 
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
-            const link = card.dataset.video;
-            iframe.src = link; // only set on click
-            modal.style.display = 'flex';
-            overlay.style.display = 'block';
-        });
-    });
+let recent = [];
 
-    overlay.addEventListener('click', closeVideo);
+const videosArea = document.getElementById("videosArea");
+const recentArea = document.getElementById("recentArea");
+const searchInput = document.getElementById("searchInput");
+const buttons = document.querySelectorAll(".category-select button");
+
+buttons.forEach(btn=>{
+ btn.onclick=()=>{
+   buttons.forEach(b=>b.classList.remove("active"));
+   btn.classList.add("active");
+   showVideos(btn.dataset.cat);
+ }
 });
 
-function closeVideo() {
-    document.getElementById('overlay').style.display = 'none';
-    document.getElementById('videoModal').style.display = 'none';
-    document.getElementById('modalVideo').src = ''; // stop video
+searchInput.oninput=()=>showVideos(getActiveCategory());
+
+function getActiveCategory(){
+ return document.querySelector(".category-select .active").dataset.cat;
 }
+
+function showVideos(category){
+ videosArea.innerHTML="";
+ const keyword = searchInput.value.toLowerCase();
+
+ videos.filter(v=>{
+   return (category==="all" || v.cat===category) &&
+          v.title.toLowerCase().includes(keyword);
+ }).forEach(v=>renderCard(v, videosArea));
+}
+
+function renderCard(video, area){
+ const div=document.createElement("div");
+ div.className="video-card";
+ div.innerHTML=`
+   <img src="${video.img}">
+   <div class="play-icon"><i class="fa fa-play"></i></div>
+   <div class="video-title">${video.title}</div>
+ `;
+ div.onclick=()=>{
+   document.getElementById("modalVideo").src=video.video;
+   document.getElementById("videoModal").style.display="block";
+   document.getElementById("overlay").style.display="block";
+   addRecent(video);
+ };
+ area.appendChild(div);
+}
+
+function addRecent(video){
+ if(!recent.find(v=>v.title===video.title)){
+   recent.unshift(video);
+   if(recent.length>4) recent.pop();
+ }
+ renderRecent();
+}
+
+function renderRecent(){
+ recentArea.innerHTML="";
+ recent.forEach(v=>renderCard(v, recentArea));
+}
+
+function closeVideo(){
+ document.getElementById("videoModal").style.display="none";
+ document.getElementById("overlay").style.display="none";
+ document.getElementById("modalVideo").src="";
+}
+
+showVideos("all");
 </script>
 
 </body>
