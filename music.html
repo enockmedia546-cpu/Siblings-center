@@ -6,60 +6,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- Firebase -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBdlDAj6SBzRChqDRfvecD_XRFgeSjKtiQ",
-    authDomain: "siblings-140f7.firebaseapp.com",
-    projectId: "siblings-140f7",
-    storageBucket: "siblings-140f7.appspot.com",
-    messagingSenderId: "17665689198",
-    appId: "1:17665689198:web:575e848f837d7b35b4c87f",
-    measurementId: "G-XWB4B54TLQ"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBdlDAj6SBzRChqDRfvecD_XRFgeSjKtiQ",
+  authDomain: "siblings-140f7.firebaseapp.com",
+  projectId: "siblings-140f7",
+  storageBucket: "siblings-140f7.appspot.com",
+  messagingSenderId: "17665689198",
+  appId: "1:17665689198:web:575e848f837d7b35b4c87f",
+  measurementId: "G-XWB4B54TLQ"
+};
 
-  const app = initializeApp(firebaseConfig);
-  window.db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+window.db = getFirestore(app);
 </script>
 
 <style>
+/* General styling, keep as your existing design */
 body, html{margin:0;padding:0;font-family:Arial;width:100%;height:100%;}
 .full-bg{width:100%;min-height:100vh;background-size:cover;background-position:center;position:relative;color:#5B0E9E;padding-bottom:50px;}
 .header{display:flex;align-items:center;justify-content:space-between;background:#5B0E9E;color:white;padding:15px 20px;border-bottom-left-radius:20px;border-bottom-right-radius:20px;}
 .header i{color:white;cursor:pointer;font-size:22px;}
 .header h3{margin:0;flex-grow:1;text-align:center;font-size:20px;}
 
-/* REQUEST */
 .request-btn{background:#5B0E9E;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
 .request-btn i{margin-right:5px;}
 #requestPop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center;}
 #requestPop .popup-content{background:white;padding:20px;border-radius:12px;width:90%;max-width:400px;position:relative;}
 #requestPop .popup-content span{position:absolute;top:8px;right:12px;cursor:pointer;font-size:20px;}
 
-/* CATEGORY GRID */
 .category-grid{padding:20px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:10px;}
 .category-card{display:flex;align-items:center;gap:12px;cursor:pointer;color:#5B0E9E;font-weight:bold;text-shadow:0 2px 5px rgba(255,255,255,0.8);}
 .music-icon{font-size:26px;color:#5B0E9E;}
 
-/* SEARCH */
 #searchBar{width:95%;padding:10px 12px;margin:10px auto;border-radius:12px;border:none;font-size:16px;}
 
-/* MUSIC LIST */
 #musicList{background-size:cover;border-radius:20px;padding:15px;display:flex;flex-direction:column;gap:10px;margin:10px;}
 .music-bar{display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;color:#5B0E9E;}
 .music-bar div b,.music-bar div p{text-shadow:0 2px 5px rgba(255,255,255,0.8);}
 
-/* PLAYER */
 #player{display:flex;flex-direction:column;width:90%;max-width:900px;margin:20px auto;padding:20px;text-align:center;border-radius:20px;position:relative;background-size:cover;background-position:center;}
 #player::before{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background: rgba(255,255,255,0.1);border-radius:20px;z-index:0;}
 #player > *{position:relative;z-index:1;}
 #visualizer{height:120px;display:flex;align-items:flex-end;gap:5px;margin-bottom:15px;}
 .bar{flex:1;background:#5B0E9E;border-radius:4px;height:10%;}
 
-/* CONTROLS */
 .controls{display:flex;justify-content:center;gap:30px;font-size:26px;margin-top:20px;color:#5B0E9E;}
 .extra-controls{display:flex;justify-content:center;gap:25px;font-size:18px;margin-top:15px;color:#5B0E9E;}
 </style>
@@ -101,7 +95,7 @@ body, html{margin:0;padding:0;font-family:Arial;width:100%;height:100%;}
       <i class="fa fa-sliders" onclick="toggleEQ()"></i>
     </div>
   </div>
-  <audio id="audio"></audio>
+  <audio id="audio" autoplay></audio>
 </div>
 
 <!-- REQUEST POPUP -->
@@ -120,24 +114,14 @@ import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/fi
 
 // SONG DATA
 const songs=[
-  {title:"We Won't Stop",artist:"Jw",src:"jw.mp3",cat:"Jw Songs"},
-  {title:"Track 1",artist:"Modecaii",src:"mod1.mp3",cat:"Modecaii Zm"},
-  {title:"Track 2",artist:"Modecaii",src:"mod2.mp3",cat:"Modecaii Zm"},
-  {title:"Track 3",artist:"Modecaii",src:"mod3.mp3",cat:"Modecaii Zm"},
-  {title:"Track 4",artist:"Modecaii",src:"mod4.mp3",cat:"Modecaii Zm"},
-  {title:"Track 5",artist:"Modecaii",src:"mod5.mp3",cat:"Modecaii Zm"},
-  {title:"Track 6",artist:"Modecaii",src:"mod6.mp3",cat:"Modecaii Zm"},
-  {title:"Track 7",artist:"Modecaii",src:"mod7.mp3",cat:"Modecaii Zm"},
-   {title:"Track 8",artist:"Modecaii",src:"mod8.mp3",cat:"Modecaii Zm"},
-  {title:"Track 1",artist:"Modecaii",src:"mod1.mp3",cat:"Modecaii Zm"},
-  {title:"Track 1",artist:"Modecaii",src:"mod1.mp3",cat:"Modecaii Zm"},
-  {title:"Track 1",artist:"Modecaii",src:"mod1.mp3",cat:"Modecaii Zm"},
-  {title:"Peace",artist:"Relax",src:"music/song4.mp3",cat:"Relax"}
+  {title:"We Won't Stop",artist:"Jw",src:"jw.mp3",cat:"Jw Songs", artwork:"cover1.jpg"},
+  {title:"Track 1",artist:"Modecaii",src:"mod1.mp3",cat:"Modecaii Zm", artwork:"cover2.jpg"},
+  {title:"Track 2",artist:"Modecaii",src:"mod2.mp3",cat:"Modecaii Zm", artwork:"cover3.jpg"},
+  {title:"Peace",artist:"Relax",src:"music/song4.mp3",cat:"Relax", artwork:"cover4.jpg"}
 ];
 const categories=["Jw Songs","Zed Mix","Yo Maps Yo","Odies","Chile One","Modecaii Zm","African Mix"];
 let currentSongs=[], index=0, currentCat=null, isShuffle=false, repeatMode="all";
 
-// FIREBASE
 const db = window.db;
 
 // POPUP REQUEST
@@ -219,7 +203,15 @@ function filterSongs(){
 }
 
 // AUDIO PLAYER
-function load(){ audio.src=currentSongs[index].src; titleEl.innerText=currentSongs[index].title; artistEl.innerText=currentSongs[index].artist; audio.play(); playBtn.className="fa fa-pause"; }
+function load(){
+  const song=currentSongs[index];
+  audio.src=song.src;
+  titleEl.innerText=song.title;
+  artistEl.innerText=song.artist;
+  audio.play();
+  playBtn.className="fa fa-pause";
+  updateMediaSession(song);
+}
 function toggle(){ if(audio.paused){audio.play();playBtn.className="fa fa-pause";} else{audio.pause();playBtn.className="fa fa-play";} }
 function next(){ index=isShuffle?Math.floor(Math.random()*currentSongs.length):(index+1)%currentSongs.length; load(); }
 function prev(){ index=(index-1+currentSongs.length)%currentSongs.length; load(); }
@@ -241,7 +233,26 @@ for(let i=0;i<20;i++){ let b=document.createElement("div"); b.className="bar"; v
 function animate(){ requestAnimationFrame(animate); analyser.getByteFrequencyData(data); document.querySelectorAll(".bar").forEach((b,i)=>{ b.style.height=(data[i]/255*100)+"%"; }); }
 animate();
 
-// EXPOSE FUNCTIONS GLOBALLY
+// MEDIA SESSION API
+function updateMediaSession(song){
+  if('mediaSession' in navigator){
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: song.artist,
+      album: "Siblings Center",
+      artwork: [
+        { src: song.artwork || "cover1.jpg", sizes: "96x96", type: "image/jpeg" },
+        { src: song.artwork || "cover1.jpg", sizes: "512x512", type: "image/jpeg" }
+      ]
+    });
+    navigator.mediaSession.setActionHandler('play', ()=>{ audio.play(); });
+    navigator.mediaSession.setActionHandler('pause', ()=>{ audio.pause(); });
+    navigator.mediaSession.setActionHandler('previoustrack', ()=>{ prev(); });
+    navigator.mediaSession.setActionHandler('nexttrack', ()=>{ next(); });
+  }
+}
+
+// EXPOSE FUNCTIONS
 window.load = load; window.toggle = toggle; window.next = next; window.prev = prev;
 window.toggleShuffle = toggleShuffle; window.toggleRepeat = toggleRepeat;
 window.showPlaylist = showPlaylist; window.toggleEQ = toggleEQ;
