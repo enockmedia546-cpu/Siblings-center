@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Siblings Center | Music</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:url("Big.jpg") center/cover no-repeat fixed;
+  color:white;
+}
+
+.overlay{
+  background:rgba(0,0,0,.6);
+  min-height:100vh;
+  padding:20px;
+}
+
+.player{
+  text-align:center;
+}
+
+.player h2{
+  margin:10px 0;
+}
+
+.controls i{
+  font-size:28px;
+  margin:15px;
+  cursor:pointer;
+}
+
+#musicList{
+  margin-top:20px;
+  max-height:65vh;
+  overflow-y:auto;
+}
+
+.song{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,.1);
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+.song button{
+  background:#7c3aed;
+  border:none;
+  color:white;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.song a{
+  color:white;
+  margin-left:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+<div class="player">
+  <h2 id="title">Select a song</h2>
+  <audio id="audio" playsinline></audio>
+
+  <div class="controls">
+    <i class="fa fa-backward" onclick="prev()"></i>
+    <i class="fa fa-play" id="playBtn" onclick="toggle()"></i>
+    <i class="fa fa-forward" onclick="next()"></i>
+  </div>
+</div>
+
+<div id="musicList"></div>
+
+</div>
+
+<script>
+const songs=[
+  {title:"Worship 1",artist:"Siblings",src:"music1.mp3"},
+  {title:"Praise 2",artist:"Siblings",src:"music2.mp3"},
+  {title:"Gospel 3",artist:"Siblings",src:"music3.mp3"}
+];
+
+const list=document.getElementById("musicList");
+const audio=document.getElementById("audio");
+const title=document.getElementById("title");
+const playBtn=document.getElementById("playBtn");
+
+let index=0;
+
+songs.forEach((s,i)=>{
+  list.innerHTML+=`
+    <div class="song">
+      <span>${s.title}</span>
+      <div>
+        <button onclick="load(${i})">Play</button>
+        <a href="${s.src}" download><i class="fa fa-download"></i></a>
+      </div>
+    </div>
+  `;
+});
+
+function load(i){
+  index=i;
+  audio.src=songs[i].src;
+  audio.play();
+  title.textContent=songs[i].title;
+  playBtn.className="fa fa-pause";
+  updateMediaSession(songs[i]);
+}
+
+function toggle(){
+  if(audio.paused){
+    audio.play();
+    playBtn.className="fa fa-pause";
+  }else{
+    audio.pause();
+    playBtn.className="fa fa-play";
+  }
+}
+
+function next(){
+  index=(index+1)%songs.length;
+  load(index);
+}
+
+function prev(){
+  index=(index-1+songs.length)%songs.length;
+  load(index);
+}
+
+/* 🔥 ANDROID LOCK-SCREEN & NOTIFICATION CONTROLS */
+function updateMediaSession(song){
+  if("mediaSession" in navigator){
+    navigator.mediaSession.metadata=new MediaMetadata({
+      title:song.title,
+      artist:song.artist,
+      album:"Siblings Center",
+      artwork:[
+        {src:"Big.jpg",sizes:"512x512",type:"image/jpeg"}
+      ]
+    });
+
+    navigator.mediaSession.setActionHandler("play",()=>audio.play());
+    navigator.mediaSession.setActionHandler("pause",()=>audio.pause());
+    navigator.mediaSession.setActionHandler("previoustrack",()=>prev());
+    navigator.mediaSession.setActionHandler("nexttrack",()=>next());
+  }
+}
+</script>
+
+</body>
+</html>
